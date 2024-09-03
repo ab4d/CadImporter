@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>ab4d.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\cameras.png" />
+    <None Remove="Resources\objects.png" />
+    <None Remove="Resources\options.png" />
+    <None Remove="step_files\as1_pe_203.stp" />
+    <None Remove="step_files\cube.stp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ab4d.ico" />
+    <Content Include="step_files\as1_pe_203.stp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="step_files\cube.stp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ab4d.OpenCascade" Version="0.1.0-beta1" />
+    <PackageReference Include="Ab3d.PowerToys" Version="11.1.8864" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.0.8976" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+    <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
+    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="OpenCascade\*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\cameras.png" />
+    <Resource Include="Resources\objects.png" />
+    <Resource Include="Resources\options.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="OpenCascade\" />
+  </ItemGroup>
+
+</Project>

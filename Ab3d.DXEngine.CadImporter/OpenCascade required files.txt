@@ -1,0 +1,47 @@
+Required dll-s from OpenCASCADE v7.8.0
+The files below must be available to start the CadImporter application (you can use the "copy-open-cascade-dlls.bat" script to copy the required dll-s)
+
+The two zip files with required files can be downloaded from https://github.com/Open-Cascade-SAS/OCCT/releases/tag/V7_8_0
+
+1st zip file: occt-vc143-64.zip:
+occt-vc143-64\win64\vc14\bin\TKernel.dll
+occt-vc143-64\win64\vc14\bin\TKXSBase.dll
+occt-vc143-64\win64\vc14\bin\TKDESTEP.dll
+occt-vc143-64\win64\vc14\bin\TKG3d.dll
+occt-vc143-64\win64\vc14\bin\TKMath.dll
+occt-vc143-64\win64\vc14\bin\TKBRep.dll
+occt-vc143-64\win64\vc14\bin\TKLCAF.dll
+occt-vc143-64\win64\vc14\bin\TKMesh.dll
+occt-vc143-64\win64\vc14\bin\TKBinXCAF.dll
+occt-vc143-64\win64\vc14\bin\TKGeomBase.dll
+occt-vc143-64\win64\vc14\bin\TKXCAF.dll
+occt-vc143-64\win64\vc14\bin\TKShHealing.dll
+occt-vc143-64\win64\vc14\bin\TKTopAlgo.dll
+occt-vc143-64\win64\vc14\bin\TKG2d.dll
+occt-vc143-64\win64\vc14\bin\TKDE.dll
+occt-vc143-64\win64\vc14\bin\TKCDF.dll
+occt-vc143-64\win64\vc14\bin\TKBin.dll
+occt-vc143-64\win64\vc14\bin\TKService.dll
+occt-vc143-64\win64\vc14\bin\TKBinL.dll
+occt-vc143-64\win64\vc14\bin\TKCAF.dll
+occt-vc143-64\win64\vc14\bin\TKVCAF.dll
+occt-vc143-64\win64\vc14\bin\TKV3d.dll
+occt-vc143-64\win64\vc14\bin\TKGeomAlgo.dll
+occt-vc143-64\win64\vc14\bin\TKBO.dll
+occt-vc143-64\win64\vc14\bin\TKHLR.dll
+occt-vc143-64\win64\vc14\bin\TKBool.dll
+occt-vc143-64\win64\vc14\bin\TKPrim.dll
+occt-vc143-64\win64\vc14\bin\TKTopAlgo.dll // The followig can be skipped when ImporterSettings.CalculateShapeProperties is false
+
+
+2nd zip file: 3rdparty-vc14-64.zip:
+3rdparty-vc14-64\tbb2021.5-vc14-x64\bin\tbb12.dll
+3rdparty-vc14-64\tbb2021.5-vc14-x64\bin\tbbmalloc.dll
+3rdparty-vc14-64\jemalloc-vc14-64\bin\jemalloc.dll
+3rdparty-vc14-64\openvr-1.14.15-64\bin\win64\openvr_api.dll
+3rdparty-vc14-64\freeimage-3.17.0-vc14-64\bin\FreeImage.dll 
+3rdparty-vc14-64\freetype-2.5.5-vc14-64\bin\freetype.dll 
+3rdparty-vc14-64\ffmpeg-3.3.4-64\bin\avcodec-57.dll
+3rdparty-vc14-64\ffmpeg-3.3.4-64\bin\avformat-57.dll 
+3rdparty-vc14-64\ffmpeg-3.3.4-64\bin\swscale-4.dll
+3rdparty-vc14-64\ffmpeg-3.3.4-64\bin\avutil-55.dll

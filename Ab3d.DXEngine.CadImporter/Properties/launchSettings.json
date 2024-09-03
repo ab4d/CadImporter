@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ab3d.DXEngine.CadImporter": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
