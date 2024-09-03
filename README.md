@@ -6,6 +6,9 @@
 
 The appliction is using [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) for DirectX rendering and [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) for 3D helper functions.
 
+Ab4d.OpenCascade library is currently in beta version. 
+A future version will also support importing from IGES and BREP files.
+
 The CadImporter reads the hierarchy of the Parts (Compound or Solid). It can use instanced Shells that are defined by a list of Faces. 
 Each face can be defined by many Edges. For each Edge it is possible to get the original curve with its parameters. 
 For example, you can get a location and a radius for a Circle; for BSpline curve you can get control points (Poles), weights and knots.
