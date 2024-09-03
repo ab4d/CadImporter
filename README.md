@@ -67,3 +67,8 @@ For example, in this sample the initialization of ImporterUnitsComboBox was remo
     // The following line will try to use CadUnitTypes enum from Ab4d.OpenCascade library. This will load OpenCascade dlls.
     ImporterUnitsComboBox.ItemsSource = Enum.GetNames<Ab4d.OpenCascade.CadUnitTypes>();
 
+## Roadmap
+
+- Add support for importing IGES and BREP files.
+- Add sample that works with Ab4d.SharpEngine.
+- Add progress indication while reading the file.
