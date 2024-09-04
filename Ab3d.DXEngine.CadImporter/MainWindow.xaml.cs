@@ -1687,7 +1687,7 @@ namespace Ab3d.DXEngine.CadImporter
 
             Ab3d.Utilities.ModelIterator.IterateModelVisualsObjects(RootModelVisual, (visual3D, transform3D) =>
             {
-                if (visual3D is SceneNodeVisual3D sceneNodeVisual)
+                if (visual3D is SceneNodeVisual3D sceneNodeVisual && sceneNodeVisual.SceneNode is MeshObjectNode)
                     sceneNodeVisual.IsVisible = isVisible;
             });
         }
@@ -1701,8 +1701,8 @@ namespace Ab3d.DXEngine.CadImporter
 
             Ab3d.Utilities.ModelIterator.IterateModelVisualsObjects(RootModelVisual, (visual3D, transform3D) =>
             {
-                if (visual3D is MultiLineVisual3D multiLineVisual3D)
-                    multiLineVisual3D.IsVisible = isVisible;
+                if (visual3D is SceneNodeVisual3D sceneNodeVisual && sceneNodeVisual.SceneNode is ScreenSpaceLineNode)
+                    sceneNodeVisual.IsVisible = isVisible;
             });
         }
 
