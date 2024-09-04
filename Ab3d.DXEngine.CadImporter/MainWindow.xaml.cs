@@ -529,7 +529,16 @@ namespace Ab3d.DXEngine.CadImporter
                             var edgePositionsCount = GetEdgePositionsCount(faceData);
 
                             var edgePositions = new Vector3[edgePositionsCount];
-                            AddEdgePositions(faceData, edgePositions);
+                            
+                            if (transformation != null)
+                            {
+                                var matrix = transformation.Value;
+                                AddEdgePositions(faceData, edgePositions, ref matrix);
+                            }
+                            else
+                            {
+                                AddEdgePositions(faceData, edgePositions);
+                            }
 
                             var screenSpaceLineNode = new ScreenSpaceLineNode(edgePositions, isLineStrip: false, isLineClosed: false, _edgeLineMaterial, name: $"{onePart.Name}_Face{j}_EdgeLines");
 
@@ -1386,6 +1395,18 @@ namespace Ab3d.DXEngine.CadImporter
             int endPositionIndex = edgePositions.Count;
 
             for (int i = startPositionIndex; i < endPositionIndex; i++)
+            {
+                var onePosition = edgePositions[i];
+                Vector3.Transform(ref onePosition, ref parentTransformMatrix, out onePosition);
+                edgePositions[i] = onePosition;
+            }
+        }
+
+        private void AddEdgePositions(CadFace cadFace, Vector3[] edgePositions, ref SharpDX.Matrix parentTransformMatrix)
+        {
+            AddEdgePositions(cadFace, edgePositions);
+
+            for (int i = 0; i < edgePositions.Length; i++)
             {
                 var onePosition = edgePositions[i];
                 Vector3.Transform(ref onePosition, ref parentTransformMatrix, out onePosition);
