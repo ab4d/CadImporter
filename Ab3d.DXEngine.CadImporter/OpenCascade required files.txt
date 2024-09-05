@@ -7,6 +7,7 @@ The two zip files with required files can be downloaded from https://github.com/
 occt-vc143-64\win64\vc14\bin\TKernel.dll
 occt-vc143-64\win64\vc14\bin\TKXSBase.dll
 occt-vc143-64\win64\vc14\bin\TKDESTEP.dll
+occt-vc143-64\win64\vc14\bin\TKDEIGES.dll
 occt-vc143-64\win64\vc14\bin\TKG3d.dll
 occt-vc143-64\win64\vc14\bin\TKMath.dll
 occt-vc143-64\win64\vc14\bin\TKBRep.dll

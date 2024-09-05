@@ -174,14 +174,14 @@ namespace Ab3d.DXEngine.CadImporter
                 //string fileName = "cube.stp";
                 fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "step_files", fileName);
 
-                LoadStepFile(fileName);
+                LoadCadFile(fileName);
             };
 
-            var dragAndDropHelper = new DragAndDropHelper(this, ".stp .step");
+            var dragAndDropHelper = new DragAndDropHelper(this, ".step .stp .iges .igs");
             dragAndDropHelper.FileDropped += (sender, args) =>
             {
                 DragDropInfoTextBlock.Visibility = Visibility.Collapsed; // Show only until user knows what to do
-                LoadStepFile(args.FileName);
+                LoadCadFile(args.FileName);
             };
 
             ViewportBorder.MouseMove += ViewportBorderOnMouseMove;
@@ -311,7 +311,7 @@ namespace Ab3d.DXEngine.CadImporter
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void LoadStepFile(string fileName)
+        private void LoadCadFile(string fileName)
         {
             RootModelVisual.Children.Clear();
 
@@ -392,7 +392,12 @@ namespace Ab3d.DXEngine.CadImporter
                     _cadImporter.Initialize(importerSettings);
 
                     // Load file
-                    _cadAssembly = _cadImporter.ImportStepFile(fileName);
+
+                    var extension = System.IO.Path.GetExtension(fileName);
+                    if (extension.Equals(".iges", StringComparison.OrdinalIgnoreCase) || extension.Equals(".igs", StringComparison.OrdinalIgnoreCase))
+                        _cadAssembly = _cadImporter.ImportIgesFile(fileName);
+                    else
+                        _cadAssembly = _cadImporter.ImportStepFile(fileName);
                 }
                 catch (Exception ex)
                 {
@@ -529,24 +534,23 @@ namespace Ab3d.DXEngine.CadImporter
                             var edgePositionsCount = GetEdgePositionsCount(faceData);
 
                             var edgePositions = new Vector3[edgePositionsCount];
-                            
-                            if (transformation != null)
-                            {
-                                var matrix = transformation.Value;
-                                AddEdgePositions(faceData, edgePositions, ref matrix);
-                            }
-                            else
-                            {
-                                AddEdgePositions(faceData, edgePositions);
-                            }
+
+                            AddEdgePositions(faceData, edgePositions);
+                            // To transform edge positions call
+                            // var matrix = transformation.Value;
+                            // AddEdgePositions(faceData, edgePositions, ref matrix);
+
 
                             var screenSpaceLineNode = new ScreenSpaceLineNode(edgePositions, isLineStrip: false, isLineClosed: false, _edgeLineMaterial, name: $"{onePart.Name}_Face{j}_EdgeLines");
+                            
+                            if (transformation != null)
+                                screenSpaceLineNode.Transform = transformation;
 
                             _disposables?.Add(screenSpaceLineNode);
 
                             var sceneNodeVisual3D = new SceneNodeVisual3D(screenSpaceLineNode);
                             sceneNodeVisual3D.SetName($"{onePart.Name}_Face{j}_EdgeLines_Visual3D");
-
+                            
                             parentVisual3D.Children.Add(sceneNodeVisual3D);
 
 
@@ -654,47 +658,67 @@ namespace Ab3d.DXEngine.CadImporter
                     IsExpanded = false
                 };
 
+                // Bigger models can have a lot of Faces, so we generate Face items only when user expands a CadPart (when CadShell is shown)
+                cadPartItem.Expanded += ShellItemOnExpanded;
+
                 cadPartItem.Items.Add(shellItem);
+            }
+        }
 
+        private void ShellItemOnExpanded(object sender, RoutedEventArgs e)
+        {
+            // Bigger models can have a lot of Faces, so we generate Face items only when user expands a CadPart (when CadShell is shown)
+            // Here we check if the Face TreeViewItems were already generated (cadShellTreeViewItem.Items.Count > 0) we have the correct data (selectedPartInfo and cadShell)
+            if (sender is not TreeViewItem treeViewItem || 
+                treeViewItem.Items.Count != 1 ||
+                treeViewItem.Items[0] is not TreeViewItem cadShellTreeViewItem ||
+                cadShellTreeViewItem.Items.Count > 0 ||
+                cadShellTreeViewItem.Tag is not SelectedPartInfo selectedPartInfo ||
+                selectedPartInfo.SelectedSubObject is not CadShell cadShell)
+            {
+                return;
+            }
 
-                foreach (var cadFace in cadShell.Faces)
+            
+            var cadPart = selectedPartInfo.CadPart;
+
+            foreach (var cadFace in cadShell.Faces)
+            {
+                var faceItem = new TreeViewItem
                 {
-                    var faceItem = new TreeViewItem
+                    Header = "Face",
+                    Tag = new SelectedPartInfo(cadPart, cadFace),
+                    IsExpanded = false
+                };
+
+                cadShellTreeViewItem.Items.Add(faceItem);
+
+
+                if (cadFace.EdgeCurves != null && cadFace.EdgeCurves.Length > 0)
+                {
+                    var wireItem = new TreeViewItem
                     {
-                        Header = "Face",
-                        Tag    = new SelectedPartInfo(cadPart, cadFace),
+                        Header = "Wire",
+                        Tag = new SelectedPartInfo(cadPart, cadFace),
                         IsExpanded = false
                     };
 
-                    shellItem.Items.Add(faceItem);
+                    faceItem.Items.Add(wireItem);
 
-
-                    if (cadFace.EdgeCurves != null && cadFace.EdgeCurves.Length > 0)
+                    for (int i = 0; i < cadFace.EdgeCurves.Length; i++)
                     {
-                        var wireItem = new TreeViewItem
+                        var edgeItem = new TreeViewItem
                         {
-                            Header = "Wire",
-                            Tag = new SelectedPartInfo(cadPart, cadFace),
+                            Header = "Edge",
+                            Tag = new SelectedPartInfo(cadPart, cadFace, i * 2),
                             IsExpanded = false
                         };
 
-                        faceItem.Items.Add(wireItem);
+                        wireItem.Items.Add(edgeItem);
 
-                        for (int i = 0; i < cadFace.EdgeCurves.Length; i ++)
-                        {
-                            var edgeItem = new TreeViewItem
-                            {
-                                Header = "Edge",
-                                Tag = new SelectedPartInfo(cadPart, cadFace, i * 2),
-                                IsExpanded = false
-                            };
-
-                            wireItem.Items.Add(edgeItem);
-
-                            var cadCurve = cadFace.EdgeCurves[i];
-                            if (cadCurve != null)
-                                AddCadCurveTreeViewItem(cadCurve, edgeItem);
-                        }
+                        var cadCurve = cadFace.EdgeCurves[i];
+                        if (cadCurve != null)
+                            AddCadCurveTreeViewItem(cadCurve, edgeItem);
                     }
                 }
             }
@@ -721,8 +745,6 @@ namespace Ab3d.DXEngine.CadImporter
 
             DeselectButton.IsEnabled = false;
             ZoomToObjectButton.IsEnabled = false;
-
-            InfoTextBox.Text = "";
         }
 
         private void SelectCadObject(TreeViewItem selectedTreeViewItem)
@@ -1166,9 +1188,20 @@ namespace Ab3d.DXEngine.CadImporter
             }
 
             Camera1.Offset = new Vector3D(0, 0, 0);
+
+
+            var boundingBoxLength = cadAssemblyBoundingBox.Size.Length();
+            
+            if (Ab3d.Utilities.MathUtils.IsZero(boundingBoxLength))
+            {
+                // When bounding box is not defined, call FitIntoView
+                Camera1.FitIntoView();
+                return;
+            }
+            
             Camera1.TargetPosition = cadAssemblyBoundingBox.Center.ToWpfPoint3D();
-            Camera1.Distance = cadAssemblyBoundingBox.Size.Length() * 2;
-            Camera1.CameraWidth = cadAssemblyBoundingBox.Size.Length() * 1.5;
+            Camera1.Distance = boundingBoxLength * 2;
+            Camera1.CameraWidth = boundingBoxLength * 1.5;
 
             // Because cadAssemblyBoundingBox is in Y-up coordinates,
             // we need to swap Y and Z and negate Y when we are using Z-up coordinate system
@@ -1183,13 +1216,33 @@ namespace Ab3d.DXEngine.CadImporter
         {
             var sb = new StringBuilder();
 
+            int totalPositions = 0;
+            int totalTriangles = 0;
+
             sb.AppendLine("Imported CadAssembly:");
             sb.AppendLine("Shells:");
             for (var i = 0; i < cadAssembly.Shells.Count; i++)
             {
                 var oneShell = cadAssembly.Shells[i];
-                sb.Append($"[{i}] {oneShell.Id} '{oneShell.Name}' FacesCount: {oneShell.Faces.Count}\r\n");
+                sb.Append($"[{i}] {oneShell.Id} '{oneShell.Name}' FacesCount: {oneShell.Faces.Count}");
+
+                int shellPositions = 0;
+                int shellTriangles = 0;
+                
+                foreach (var cadFace in oneShell.Faces)
+                {
+                    shellPositions += cadFace.VertexBuffer.Length / 8;    // 8 floats for one position (xPos, yPos, zPos, xNormal, yNormal, zNormal, u, v)
+                    shellTriangles += cadFace.TriangleIndices.Length / 3; // 3 indices for one triangle
+                }
+
+                sb.Append($"; Positions count: {shellPositions:#,##0}; Triangles count: {shellTriangles:#,##0}\r\n");
+
+                totalPositions += shellPositions;
+                totalTriangles += shellTriangles;
             }
+
+            sb.Append($"\r\nTotal positions count: {totalPositions:#,##0}\r\nTotal triangles count: {totalTriangles:#,##0}\r\n");
+
 
             sb.AppendLine("\r\nParts:");
 
@@ -1401,7 +1454,7 @@ namespace Ab3d.DXEngine.CadImporter
                 edgePositions[i] = onePosition;
             }
         }
-
+        
         private void AddEdgePositions(CadFace cadFace, Vector3[] edgePositions, ref SharpDX.Matrix parentTransformMatrix)
         {
             AddEdgePositions(cadFace, edgePositions);
@@ -1724,6 +1777,9 @@ namespace Ab3d.DXEngine.CadImporter
             {
                 if (visual3D is SceneNodeVisual3D sceneNodeVisual && sceneNodeVisual.SceneNode is ScreenSpaceLineNode)
                     sceneNodeVisual.IsVisible = isVisible;
+
+                //if (visual3D is MultiLineVisual3D multiLineVisual3D)
+                //    multiLineVisual3D.IsVisible = isVisible;
             });
         }
 
@@ -1783,7 +1839,7 @@ namespace Ab3d.DXEngine.CadImporter
             if (_fileName == null)
                 return;
 
-            LoadStepFile(_fileName);
+            LoadCadFile(_fileName);
         }
 
         private void LoadButton_OnClick(object sender, RoutedEventArgs e)
@@ -1791,11 +1847,11 @@ namespace Ab3d.DXEngine.CadImporter
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "step_files");
 
-            openFileDialog.Filter = "CAD file (*.step;*.stp)|*.step;*.stp";
-            openFileDialog.Title = "Select CAD file";
+            openFileDialog.Filter = "CAD file (*.step;*.stp;*.iges;*.igs)|*.step;*.stp;*.iges;*.igs";
+            openFileDialog.Title = "Select CAD file (STEP or IGES)";
 
             if ((openFileDialog.ShowDialog() ?? false) && !string.IsNullOrEmpty(openFileDialog.FileName))
-                LoadStepFile(openFileDialog.FileName);
+                LoadCadFile(openFileDialog.FileName);
         }
     }
 }

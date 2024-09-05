@@ -277,7 +277,7 @@
 
         <StackPanel Grid.Column="0" Grid.Row="0" Margin="10 4" VerticalAlignment="Top" HorizontalAlignment="Left">
             <TextBlock Text="CAD model importer" FontWeight="Bold" FontSize="20" Foreground="#333" />
-            <TextBlock Name="DragDropInfoTextBlock" Text="Drag and drop .step or .stp file here to open it" FontSize="16" Foreground="#222" Margin="0 5 0 0" />
+            <TextBlock Name="DragDropInfoTextBlock" Text="Drag and drop STEP (.step or .stp) or IGES (.iges or .igs) file here to open it" FontSize="16" Foreground="#222" Margin="0 5 0 0" />
         </StackPanel>
 
         <TextBox Name="InfoTextBox" Grid.Column="0" Grid.Row="1" FontFamily="Consolas" FontSize="10" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ></TextBox>

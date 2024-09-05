@@ -20,6 +20,7 @@ xcopy "%OCCT%\OCCT_LGPL_EXCEPTION.txt" "%TARGET_DIR%\" /Y
 xcopy "%OCCT%\TKernel.dll" "%TARGET_DIR%\" /Y
 xcopy "%OCCT%\TKXSBase.dll" "%TARGET_DIR%\" /Y
 xcopy "%OCCT%\TKDESTEP.dll" "%TARGET_DIR%\" /Y
+xcopy "%OCCT%\TKDEIGES.dll" "%TARGET_DIR%\" /Y
 xcopy "%OCCT%\TKG3d.dll" "%TARGET_DIR%\" /Y
 xcopy "%OCCT%\TKMath.dll" "%TARGET_DIR%\" /Y
 xcopy "%OCCT%\TKBRep.dll" "%TARGET_DIR%\" /Y

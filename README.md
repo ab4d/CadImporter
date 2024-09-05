@@ -2,12 +2,11 @@
 
 ![Ab3d.DXEngine.CadImporter image](https://www.ab4d.com/Images/CadImporter/CadImporter_0_1.png)
 
-**CadImporter** shows how to use Ab4d.OpenCascade library to **import and show 3D objects from STEP (.step and .stp) files**.
+**CadImporter** shows how to use Ab4d.OpenCascade library to **import and show 3D objects from STEP (.step and .stp) and IGES (.iges and .igs) files**.
 
 The appliction is using [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) for DirectX rendering and [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) for 3D helper functions.
 
-Ab4d.OpenCascade library is currently in beta version. 
-A future version will also support importing from IGES and BREP files.
+Ab4d.OpenCascade library is currently in beta version.
 
 The CadImporter reads the hierarchy of the Parts (Compound or Solid). It can use instanced Shells that are defined by a list of Faces. 
 Each face can be defined by many Edges. For each Edge it is possible to get the original curve with its parameters. 
@@ -72,6 +71,5 @@ For example, in this sample the initialization of ImporterUnitsComboBox was remo
 
 ## Roadmap
 
-- Add support for importing IGES and BREP files.
 - Add sample that works with Ab4d.SharpEngine.
 - Add progress indication while reading the file.

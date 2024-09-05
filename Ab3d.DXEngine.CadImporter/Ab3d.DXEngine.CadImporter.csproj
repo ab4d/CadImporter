@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.OpenCascade" Version="0.1.0-beta1" />
+    <PackageReference Include="Ab4d.OpenCascade" Version="0.2.0-beta2" />
     <PackageReference Include="Ab3d.PowerToys" Version="11.1.8864" />
     <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.0.8976" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
