@@ -3,10 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
-        xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
-        xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
-        xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
         xmlns:local="clr-namespace:Ab3d.DXEngine.CadImporter"
         mc:Ignorable="d"
         Title="CAD Importer" Height="700" Width="1200">
@@ -57,23 +53,23 @@
             <RowDefinition x:Name="InfoRow" Height="0" />
         </Grid.RowDefinitions>
 
-        <Border Name="ViewportBorder" Grid.Column="0" Grid.Row="0" Background="Transparent">
-            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+        <Border Name="SceneViewBorder" Grid.Column="0" Grid.Row="0" Background="Transparent">
+            <!--<dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
 
                 <Viewport3D Name="MainViewport">
                     <ModelVisual3D x:Name="RootModelVisual"/>
                     <ModelVisual3D x:Name="SelectedLinesModelVisual"/>
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
-                            <AmbientLight x:Name="SceneAmbientLight" Color="#474747" /> <!-- 20% by default-->
+                            <AmbientLight x:Name="SceneAmbientLight" Color="#474747" /> --><!-- 20% by default--><!--
                         </ModelVisual3D.Content>
                     </ModelVisual3D>
                 </Viewport3D>
 
-            </dxControls:DXViewportView>
+            </dxControls:DXViewportView>-->
         </Border>
 
-        <cameras:TargetPositionCamera Name="Camera1" Grid.Column="0" Grid.Row="0"
+        <!--<cameras:TargetPositionCamera Name="Camera1" Grid.Column="0" Grid.Row="0"
                                       TargetPosition="0 0 0" 
                                       Heading="-40" Attitude="-20" Bank="0" 
                                       Distance="200" 
@@ -117,7 +113,7 @@
                                             MouseCameraController="{Binding ElementName=MouseCameraController1}"
                                             ShowRotateInfo="False" ShowMoveInfo="False" ShowQuickZoomInfo="False" />
 
-        </StackPanel>
+        </StackPanel>-->
 
         <TabControl Name="OptionsTabControl" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Background="{StaticResource OptionsPanelBackground}" BorderThickness="0 1 0 0">
             <TabItem>
@@ -179,9 +175,9 @@
                             <CheckBox Name="ShowEdgeLinesCheckBox" Content="Edge lines" IsChecked="True" VerticalAlignment="Center" Margin="0 3 0 0" Checked="OnEdgeLinesCheckBoxCheckedChanged" Unchecked="OnEdgeLinesCheckBoxCheckedChanged"/>
 
                             <TextBlock Text="View panels:" FontWeight="Bold" Margin="0 20 0 0" />
-                            <CheckBox Name="ShowCameraNavigationCirclesCheckBox" Content="Show CameraNavigationCircles" IsChecked="True" Margin="0 3 0 0" />
-                            <CheckBox Name="ShowCameraAxisPanelCheckBox" Content="Show CameraAxisPanel" IsChecked="False" Margin="0 3 0 0" />
-                            <CheckBox Name="ShowMouseCameraControllerInfoCheckBox" Content="Show MouseCameraControllerInfo" IsChecked="True" Margin="0 3 0 0" />
+                            <CheckBox Name="ShowCameraNavigationCirclesCheckBox" Content="Show CameraNavigationCircles" IsChecked="True" Margin="0 3 0 0" Checked="OnViewPanelsVisibilityChanged" Unchecked="OnViewPanelsVisibilityChanged"/>
+                            <CheckBox Name="ShowCameraAxisPanelCheckBox" Content="Show CameraAxisPanel" IsChecked="False" Margin="0 3 0 0" Checked="OnViewPanelsVisibilityChanged" Unchecked="OnViewPanelsVisibilityChanged"/>
+                            <CheckBox Name="ShowMouseCameraControllerInfoCheckBox" Content="Show MouseCameraControllerInfo" IsChecked="True" Margin="0 3 0 0" Checked="OnViewPanelsVisibilityChanged" Unchecked="OnViewPanelsVisibilityChanged"/>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem.Content>
@@ -199,7 +195,8 @@
                                   ToolTip="When checked then exact Volume, Surface and EdgeLength are calculated. This may take some time.&#x0a;If those properties are not needed, uncheck this CheckBox to set ImporterSettings.CalculateShapeProperties to false."></CheckBox>
                         
                         <CheckBox Name="IsTwoSidedCheckBox" Content="Use two-sided materials" IsChecked="True" VerticalAlignment="Center" Margin="0 10 0 0"
-                                  ToolTip="When checked then the BackMaterial is set to the same material as Material so that all triangles of the model are visible from both sided." />
+                                  ToolTip="When checked then the BackMaterial is set to the same material as Material so that all triangles of the model are visible from both sided."
+                                  Checked="OnIsTwoSidedCheckBoxCheckedChanged" Unchecked="OnIsTwoSidedCheckBoxCheckedChanged"/>
 
 
                         <CheckBox Name="IsLoggingCheckBox" Content="Is logging" IsChecked="False" VerticalAlignment="Center" Margin="0 10 0 0"
