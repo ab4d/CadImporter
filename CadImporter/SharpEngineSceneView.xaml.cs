@@ -14,11 +14,8 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Wpf;
-using Ab4d.Vulkan;
-using Colors = System.Windows.Media.Colors;
-using MultiLineNode = Ab4d.SharpEngine.SceneNodes.MultiLineNode;
 
-namespace Ab3d.DXEngine.CadImporter
+namespace CadImporter
 {       
     /// <summary>
     /// Interaction logic for SharpEngineSceneView.xaml
@@ -147,7 +144,7 @@ namespace Ab3d.DXEngine.CadImporter
             _selectedLineMaterial = new LineMaterial()
             {
                 LineThickness = 1.5f,
-                LineColor = Colors.Red.ToColor4(),
+                LineColor = Colors.Red,
                 // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
                 // IMPORTANT: The values for selected lines have bigger depth bias than normal edge lines. This renders them on top of normal edge lines.
                 DepthBias = 0.002f,

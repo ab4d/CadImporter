@@ -10,7 +10,7 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
     <DefineConstants>SHARPENGINE</DefineConstants>
     <AssemblyName>Ab4d.SharpEngine.CadImporter</AssemblyName>
-    <RootNamespace>Ab4d.SharpEngine.CadImporter</RootNamespace>
+    <RootNamespace>CadImporter</RootNamespace>
     <DefaultItemExcludes>$(DefaultItemExcludes);DXEngineSceneView.xaml;DXEngineSceneView.xaml.cs</DefaultItemExcludes> <!-- This is required to exclude DXEngineSceneView -->
   </PropertyGroup>
 

@@ -12,7 +12,7 @@ using System.Numerics;
 using Ab4d.SharpEngine.Common;
 #endif
 
-namespace Ab3d.DXEngine.CadImporter;
+namespace CadImporter;
 
 // This helper class is used to convert generic Ab4d.OpenCascade types that use float to Vector3, PositionNormalTextureVertex and other engine specific types
 public static class CadAssemblyHelper

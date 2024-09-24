@@ -1,6 +1,6 @@
 ﻿using Ab4d.OpenCascade;
 
-namespace Ab3d.DXEngine.CadImporter
+namespace CadImporter
 {
     public class SelectedPartInfo
     {

@@ -11,7 +11,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows;
 
-namespace Ab3d.DXEngine.CadImporter
+namespace CadImporter
 {
     public class FileDroppedEventArgs : EventArgs
     {

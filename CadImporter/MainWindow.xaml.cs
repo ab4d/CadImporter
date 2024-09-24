@@ -13,7 +13,7 @@ using SharpDX;
 using System.Numerics;
 #endif
 
-namespace Ab3d.DXEngine.CadImporter
+namespace CadImporter
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

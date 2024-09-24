@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Ab3d;
 using Ab3d.Animation;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
@@ -13,7 +14,7 @@ using Ab3d.Controls;
 using Ab3d.DirectX.Materials;
 using Ab4d.OpenCascade;
 
-namespace Ab3d.DXEngine.CadImporter
+namespace CadImporter
 {       
     /// <summary>
     /// Interaction logic for DXEngineSceneView.xaml
