@@ -1,5 +1,4 @@
-﻿using SharpDX;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,6 +6,12 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.Globalization;
 using Ab4d.OpenCascade;
+
+#if DXENGINE
+using SharpDX;
+#else
+using System.Numerics;
+#endif
 
 namespace Ab3d.DXEngine.CadImporter
 {
@@ -38,6 +43,8 @@ namespace Ab3d.DXEngine.CadImporter
 
 #if DXENGINE
         private DXEngineSceneView _sceneView; 
+#else
+        private SharpEngineSceneView _sceneView; 
 #endif
 
         public MainWindow()
@@ -80,8 +87,18 @@ namespace Ab3d.DXEngine.CadImporter
 
 #if DXENGINE
             _sceneView = new DXEngineSceneView();
-            SceneViewBorder.Child = _sceneView;
+#else
+            _sceneView = new SharpEngineSceneView();
+
+            // CameraNavigationCircles and MouseCameraControllerInfo controls are not available in Ab4d.SharpEngine
+            ShowCameraAxisPanelCheckBox.Visibility = Visibility.Collapsed;
+            ShowCameraNavigationCirclesCheckBox.Visibility = Visibility.Collapsed;
+            ShowMouseCameraControllerInfoCheckBox.Visibility = Visibility.Collapsed;
+            ViewPanelsTitle.Visibility = Visibility.Collapsed;
 #endif
+
+            SceneViewBorder.Child = _sceneView;
+            
 
             // CAD application usually use Z up axis. So set that by default. This can be changed by the user in the Settings.
             _sceneView.UseZUpAxis();
@@ -291,7 +308,7 @@ namespace Ab3d.DXEngine.CadImporter
                     return;
                 }
 
-                _sceneView.ProcessCadParts(_cadAssembly, _cadAssembly.RootParts);
+                _sceneView.ProcessCadParts(_cadAssembly);
                 
                 FillTreeView(_cadAssembly);
 
@@ -571,8 +588,7 @@ namespace Ab3d.DXEngine.CadImporter
 
         private void SelectCadFace(CadPart cadPart, CadFace cadFace)
         {
-            var parentTransformMatrix = SharpDX.Matrix.Identity;
-            CadAssemblyHelper.GetTotalTransformation(cadPart, ref parentTransformMatrix);
+            var parentTransformMatrix = CadAssemblyHelper.GetTotalTransformation(cadPart);
             
             _tempEdgeLinePositions.Clear();
 
@@ -600,8 +616,7 @@ namespace Ab3d.DXEngine.CadImporter
 
         private void SelectCadShell(CadPart cadPart, CadShell cadShell)
         {
-            var parentTransformMatrix = SharpDX.Matrix.Identity;
-            CadAssemblyHelper.GetTotalTransformation(cadPart, ref parentTransformMatrix);
+            var parentTransformMatrix = CadAssemblyHelper.GetTotalTransformation(cadPart);
 
             _tempEdgeLinePositions.Clear();
 
@@ -643,8 +658,7 @@ namespace Ab3d.DXEngine.CadImporter
             if (_cadAssembly == null)
                 return;
 
-            var parentTransformMatrix = SharpDX.Matrix.Identity;
-            CadAssemblyHelper.GetTotalTransformation(cadPart.Parent, ref parentTransformMatrix);
+            var parentTransformMatrix = CadAssemblyHelper.GetTotalTransformation(cadPart.Parent);
 
             _tempEdgeLinePositions.Clear();
 
@@ -854,10 +868,7 @@ namespace Ab3d.DXEngine.CadImporter
             if (_cadAssembly == null)
                 return;
 
-            var cadAssemblyBoundingBox = new BoundingBox(new Vector3((float)_cadAssembly.BoundingBoxMin.X, (float)_cadAssembly.BoundingBoxMin.Y, (float)_cadAssembly.BoundingBoxMin.Z),
-                                                         new Vector3((float)_cadAssembly.BoundingBoxMax.X, (float)_cadAssembly.BoundingBoxMax.Y, (float)_cadAssembly.BoundingBoxMax.Z));
-
-            _sceneView.ResetCamera(cadAssemblyBoundingBox, resetCameraRotation);
+            _sceneView.ResetCamera(_cadAssembly, resetCameraRotation);
         }
 
         private void DumpLoadedParts(CadAssembly cadAssembly)
@@ -909,7 +920,7 @@ namespace Ab3d.DXEngine.CadImporter
 
             if (cadPart.TransformMatrix != null)
             {
-                SharpDX.Matrix matrix = CadAssemblyHelper.ReadMatrix(cadPart.TransformMatrix);
+                var matrix = CadAssemblyHelper.ReadMatrix(cadPart.TransformMatrix);
 
                 if (!matrix.IsIdentity) // Check again for Identity because in IsIdentity on TopLoc_Location in OCCTProxy may not be correct
                 {
@@ -1173,9 +1184,11 @@ namespace Ab3d.DXEngine.CadImporter
             if (!this.IsLoaded)
                 return;
 
-            _sceneView.IsCameraNavigationCirclesShown = ShowCameraNavigationCirclesCheckBox.IsChecked ?? false;
+#if DXENGINE
             _sceneView.IsCameraAxisPanelShown = ShowCameraAxisPanelCheckBox.IsChecked ?? false;
+            _sceneView.IsCameraNavigationCirclesShown = ShowCameraNavigationCirclesCheckBox.IsChecked ?? false;
             _sceneView.IsMouseCameraControllerInfoShown = ShowMouseCameraControllerInfoCheckBox.IsChecked ?? false;
+#endif
         }
     }
 }

@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>ab4d.ico</ApplicationIcon>
+    <DefineConstants>SHARPENGINE</DefineConstants>
+    <AssemblyName>Ab4d.SharpEngine.CadImporter</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.CadImporter</RootNamespace>
+    <DefaultItemExcludes>$(DefaultItemExcludes);DXEngineSceneView.xaml;DXEngineSceneView.xaml.cs</DefaultItemExcludes> <!-- This is required to exclude DXEngineSceneView -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ab4d.OpenCascade" Version="0.2.0-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="2.0.8956" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="DXEngineSceneView.xaml" />
+    <Compile Remove="DXEngineSceneView.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="OpenCascade\*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\cameras.png" />
+    <None Remove="Resources\objects.png" />
+    <None Remove="Resources\options.png" />
+    <None Remove="step_files\as1_pe_203.stp" />
+    <None Remove="step_files\cube.stp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ab4d.ico" />
+    <Content Include="step_files\as1_pe_203.stp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="step_files\cube.stp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\cameras.png" />
+    <Resource Include="Resources\objects.png" />
+    <Resource Include="Resources\options.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="OpenCascade\" />
+  </ItemGroup>
+
+</Project>

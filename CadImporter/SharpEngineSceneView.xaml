@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="Ab3d.DXEngine.CadImporter.SharpEngineSceneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.Wpf;assembly=Ab4d.SharpEngine.Wpf"
+             xmlns:local="clr-namespace:Ab3d.DXEngine.CadImporter"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Name="RootGrid">
+        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
+        <!--<dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+
+            <Viewport3D Name="MainViewport">
+                <ModelVisual3D x:Name="RootModelVisual"/>
+                <ModelVisual3D x:Name="SelectedLinesModelVisual"/>
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <AmbientLight x:Name="SceneAmbientLight" Color="#474747" />
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+            </Viewport3D>
+
+        </dxControls:DXViewportView>-->
+
+        <!--<cameras:TargetPositionCamera Name="Camera1" Grid.Column="0" Grid.Row="0"
+                                      TargetPosition="0 0 0" 
+                                      Heading="-40" Attitude="-20" Bank="0" 
+                                      Distance="200" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Column="0" Grid.Row="0"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    QuickZoomConditions="LeftMouseButtonPressed, RightMouseButtonPressed"
+                                    ShowRotationCenterMarker="True"
+                                    ZoomMode="MousePosition"
+                                    MouseMoveThreshold="4"
+                                    RotationCursor="Hand"
+                                    TargetCamera="{Binding ElementName=Camera1}"
+                                    EventsSourceElement="{Binding ElementName=SceneViewBorder}"
+                                    CameraRotateStarted="MouseCameraController1_OnCameraRotateStarted"
+                                    CameraRotateEnded="MouseCameraController1_OnCameraRotateEnded"
+                                    CameraMoveStarted="MouseCameraController1_OnCameraMoveStarted"
+                                    CameraMoveEnded="MouseCameraController1_OnCameraMoveEnded"/>
+
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+
+            <ab3d:CameraAxisPanel x:Name="CameraAxisPanel1" HorizontalAlignment="Left" Visibility="Collapsed"/>
+
+            <ab3d:CameraNavigationCircles x:Name="CameraNavigationCircles1" HorizontalAlignment="Left" Margin="0 0 0 0" />
+
+        </StackPanel>
+
+        <StackPanel Name="MouseCameraControllerInfoPanel" Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10 5" Orientation="Vertical" >
+            <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 0 0 5"/>
+            <ab3d:MouseCameraControllerInfo x:Name="CameraControllerInfo1"
+                                            MouseCameraController="{Binding ElementName=MouseCameraController1}"
+                                            ShowRotateInfo="True" ShowMoveInfo="True" ShowQuickZoomInfo="True" />
+
+            <TextBlock Text="Selection:" FontWeight="Bold" Margin="0 15 0 5"/>
+            <ab3d:MouseCameraControllerInfo x:Name="CameraControllerInfo2"
+                                            MouseCameraController="{Binding ElementName=MouseCameraController1}"
+                                            ShowRotateInfo="False" ShowMoveInfo="False" ShowQuickZoomInfo="False" />
+
+        </StackPanel>-->
+    </Grid>
+</UserControl>

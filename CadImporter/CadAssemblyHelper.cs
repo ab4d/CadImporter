@@ -7,6 +7,9 @@ using SharpDX;
 // To use that only in Ab3d.DXEngine, just replace the "Matrix4x4" with "SharpDX.Matrix"
 using Matrix4x4 = SharpDX.Matrix;
 using PositionNormalTextureVertex = Ab3d.DirectX.PositionNormalTexture;
+#else
+using System.Numerics;
+using Ab4d.SharpEngine.Common;
 #endif
 
 namespace Ab3d.DXEngine.CadImporter;
@@ -14,9 +17,10 @@ namespace Ab3d.DXEngine.CadImporter;
 // This helper class is used to convert generic Ab4d.OpenCascade types that use float to Vector3, PositionNormalTextureVertex and other engine specific types
 public static class CadAssemblyHelper
 {
-    public static Matrix4x4 ReadMatrix(float[] floatValues)
+#if DXENGINE
+    public static SharpDX.Matrix ReadMatrix(float[] floatValues)
     {
-        var matrix = new Matrix4x4();
+        var matrix = new SharpDX.Matrix();
 
         for (int rowIndex = 0; rowIndex < 3; rowIndex++)
         {
@@ -28,6 +32,16 @@ public static class CadAssemblyHelper
 
         return matrix;
     }
+#else
+    public static Matrix4x4 ReadMatrix(float[] floatValues)
+    {
+        // Read from float array and transpose
+        return new Matrix4x4(floatValues[0], floatValues[4], floatValues[8], 0, 
+                             floatValues[1], floatValues[5], floatValues[9], 0,
+                             floatValues[2], floatValues[6], floatValues[10], 0,
+                             floatValues[3], floatValues[7], floatValues[11], 1);
+    }
+#endif
 
     public static void AddEdgePositions(CadPart cadPart, List<Vector3> edgePositions, List<CadShell> cadShells, ref Matrix4x4 parentTransformMatrix)
     {
@@ -118,7 +132,7 @@ public static class CadAssemblyHelper
         for (int i = startPositionIndex; i < endPositionIndex; i++)
         {
             var onePosition = edgePositions[i];
-            Vector3.Transform(ref onePosition, ref parentTransformMatrix, out onePosition);
+            TransformVector3(ref onePosition, ref parentTransformMatrix, out onePosition);
             edgePositions[i] = onePosition;
         }
     }
@@ -130,7 +144,7 @@ public static class CadAssemblyHelper
         for (int i = 0; i < edgePositions.Length; i++)
         {
             var onePosition = edgePositions[i];
-            Vector3.Transform(ref onePosition, ref parentTransformMatrix, out onePosition);
+            TransformVector3(ref onePosition, ref parentTransformMatrix, out onePosition);
             edgePositions[i] = onePosition;
         }
     }
@@ -249,7 +263,7 @@ public static class CadAssemblyHelper
                                           edgePositionsBuffer[edgePositionIndex + 1],
                                           edgePositionsBuffer[edgePositionIndex + 2]);
 
-            Vector3.Transform(ref onePosition, ref parentTransformMatrix, out onePosition);
+            TransformVector3(ref onePosition, ref parentTransformMatrix, out onePosition);
 
             selectedEdgePositions[pos] = onePosition;
 
@@ -258,7 +272,7 @@ public static class CadAssemblyHelper
                                       edgePositionsBuffer[edgePositionIndex + 4],
                                       edgePositionsBuffer[edgePositionIndex + 5]);
 
-            Vector3.Transform(ref onePosition, ref parentTransformMatrix, out onePosition);
+            TransformVector3(ref onePosition, ref parentTransformMatrix, out onePosition);
 
             selectedEdgePositions[pos + 1] = onePosition;
 
@@ -266,6 +280,14 @@ public static class CadAssemblyHelper
         }
 
         return selectedEdgePositions;
+    }
+
+    public static Matrix4x4 GetTotalTransformation(CadPart? cadPart)
+    {
+        var parentTransformMatrix = Matrix4x4.Identity;
+        GetTotalTransformation(cadPart, ref parentTransformMatrix);
+
+        return parentTransformMatrix;
     }
 
     public static void GetTotalTransformation(CadPart? cadPart, ref Matrix4x4 matrix)
@@ -283,5 +305,14 @@ public static class CadAssemblyHelper
 
         if (cadPart.Parent != null)
             GetTotalTransformation(cadPart.Parent, ref matrix);
+    }
+
+    public static void TransformVector3(ref Vector3 vector, ref Matrix4x4 transform, out Vector3 result)
+    {
+#if DXENGINE
+        Vector3.Transform(ref vector, ref transform, out result);
+#else
+        result = Vector3.Transform(vector, transform);
+#endif
     }
 }

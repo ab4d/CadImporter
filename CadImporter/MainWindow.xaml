@@ -174,7 +174,7 @@
                             <CheckBox Name="ShowSolidModelCheckBox" Content="Solid model" IsChecked="True" VerticalAlignment="Center" Margin="0 3 0 0" Checked="OnShowSolidModelCheckBoxCheckedChanged" Unchecked="OnShowSolidModelCheckBoxCheckedChanged" />
                             <CheckBox Name="ShowEdgeLinesCheckBox" Content="Edge lines" IsChecked="True" VerticalAlignment="Center" Margin="0 3 0 0" Checked="OnEdgeLinesCheckBoxCheckedChanged" Unchecked="OnEdgeLinesCheckBoxCheckedChanged"/>
 
-                            <TextBlock Text="View panels:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <TextBlock Name="ViewPanelsTitle" Text="View panels:" FontWeight="Bold" Margin="0 20 0 0" />
                             <CheckBox Name="ShowCameraNavigationCirclesCheckBox" Content="Show CameraNavigationCircles" IsChecked="True" Margin="0 3 0 0" Checked="OnViewPanelsVisibilityChanged" Unchecked="OnViewPanelsVisibilityChanged"/>
                             <CheckBox Name="ShowCameraAxisPanelCheckBox" Content="Show CameraAxisPanel" IsChecked="False" Margin="0 3 0 0" Checked="OnViewPanelsVisibilityChanged" Unchecked="OnViewPanelsVisibilityChanged"/>
                             <CheckBox Name="ShowMouseCameraControllerInfoCheckBox" Content="Show MouseCameraControllerInfo" IsChecked="True" Margin="0 3 0 0" Checked="OnViewPanelsVisibilityChanged" Unchecked="OnViewPanelsVisibilityChanged"/>

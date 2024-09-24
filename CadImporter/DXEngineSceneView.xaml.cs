@@ -158,7 +158,7 @@ namespace Ab3d.DXEngine.CadImporter
             RootModelVisual.Children.Clear();
         }
 
-        public void ProcessCadParts(CadAssembly cadAssembly, List<CadPart> cadParts)
+        public void ProcessCadParts(CadAssembly cadAssembly)
         {
             if (_disposables != null)
                 _disposables.Dispose();
@@ -332,8 +332,11 @@ namespace Ab3d.DXEngine.CadImporter
             return null;
         }
 
-        public void ResetCamera(BoundingBox cadAssemblyBoundingBox, bool resetCameraRotation)
+        public void ResetCamera(CadAssembly cadAssembly, bool resetCameraRotation)
         {
+            var cadAssemblyBoundingBox = new BoundingBox(new Vector3((float)cadAssembly.BoundingBoxMin.X, (float)cadAssembly.BoundingBoxMin.Y, (float)cadAssembly.BoundingBoxMin.Z),
+                                                         new Vector3((float)cadAssembly.BoundingBoxMax.X, (float)cadAssembly.BoundingBoxMax.Y, (float)cadAssembly.BoundingBoxMax.Z));
+
             if (resetCameraRotation)
             {
                 Camera1.Heading = 220;
