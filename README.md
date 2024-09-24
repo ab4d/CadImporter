@@ -1,10 +1,12 @@
-# Ab3d.DXEngine.CadImporter
+# CadImporter
 
 ![Ab3d.DXEngine.CadImporter image](https://www.ab4d.com/Images/CadImporter/CadImporter_0_2.png)
 
 **CadImporter** shows how to use Ab4d.OpenCascade library to **import and show 3D objects from STEP (.step and .stp) and IGES (.iges and .igs) files**.
 
-The appliction is using [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) for DirectX rendering and [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) for 3D helper functions.
+This repository contains two projects:
+- **Ab3d.DXEngine.CadImporter** - shows how to use CadImporter with [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) for DirectX rendering and [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) for 3D helper functions.
+- **Ab4d.SharpEngine.CadImporter** - shows how to use CadImporter with [Ab4d.SharpEngine](https://www.ab4d.com/SharpEngine.aspx) for Vulkan rendering (can be used only on Windows).
 
 Ab4d.OpenCascade library is currently in beta version.
 
@@ -71,5 +73,4 @@ For example, in this sample the initialization of ImporterUnitsComboBox was remo
 
 ## Roadmap
 
-- Add sample that works with Ab4d.SharpEngine.
 - Add progress indication while reading the file.
