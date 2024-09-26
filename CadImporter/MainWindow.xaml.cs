@@ -44,7 +44,8 @@ namespace CadImporter
 #if DXENGINE
         private DXEngineSceneView _sceneView; 
 #else
-        private SharpEngineSceneView _sceneView; 
+        private SharpEngineSceneView _sceneView;
+        private ImporterSettings _importerSettings;
 #endif
 
         public MainWindow()
@@ -240,11 +241,11 @@ namespace CadImporter
                 {
                     // Set ImporterSettings:
 
-                    var importerSettings = new ImporterSettings();
-                    importerSettings.DefaultColor = new float[] { 0.5f, 0.5f, 0.5f, 1 };
+                    _importerSettings = new ImporterSettings();
+                    _importerSettings.DefaultColor = new float[] { 0.5f, 0.5f, 0.5f, 1 };
 
                     // When true, then exact Volume (for CadParts), SurfaceArea (for CadParts and CadFace) and EdgeLengths (for CadFace) are calculated. It may take some time to calculate those values.
-                    importerSettings.CalculateShapeProperties = CalculateShapePropertiesCheckBox.IsChecked ?? false;
+                    _importerSettings.CalculateShapeProperties = CalculateShapePropertiesCheckBox.IsChecked ?? false;
 
                     // By default, the CadImporter generates the triangulated mesh and interpolated edge positions.
                     // If you only need to get the original CAD objects and structure, you can set the following two properties to false:
@@ -253,13 +254,13 @@ namespace CadImporter
 
                     // Sets the units in which the imported CAD objects will be
                     if (ImporterUnitsComboBox.SelectedIndex != -1)
-                        importerSettings.ImportedUnits = Enum.GetValues<Ab4d.OpenCascade.CadUnitTypes>()[ImporterUnitsComboBox.SelectedIndex + 1]; // +1 because Undefined is skipped in xaml
+                        _importerSettings.ImportedUnits = Enum.GetValues<Ab4d.OpenCascade.CadUnitTypes>()[ImporterUnitsComboBox.SelectedIndex + 1]; // +1 because Undefined is skipped in xaml
                     
                     // There are many parameters for MeshingSettings.
                     // See OpenCascade's IMeshTools_Parameters: https://dev.opencascade.org/doc/refman/html/struct_i_mesh_tools___parameters.html
                     var meshDeflection = GetSelectedComboBoxDoubleValue(MeshTriangulationDeflationComboBox);
-                    importerSettings.MeshingSettings.Angle = meshDeflection;
-                    importerSettings.MeshingSettings.Deflection = meshDeflection;
+                    _importerSettings.MeshingSettings.Angle = meshDeflection;
+                    _importerSettings.MeshingSettings.Deflection = meshDeflection;
 
                     // The following settings define how the edge lines are interpolated
                     // Changing CurvatureDeflection has the biggest effect, for example:
@@ -267,11 +268,11 @@ namespace CadImporter
                     // For Circle with CurvatureDeflection with 0.5 36 positions are generated
 
                     var edgeDeflection = GetSelectedComboBoxDoubleValue(EdgeInterpolationDeflationComboBox);
-                    importerSettings.CurveInterpolationSettings.AngularDeflection = edgeDeflection;   // angular deflection in radians (default value is 0.1)
-                    importerSettings.CurveInterpolationSettings.CurvatureDeflection = edgeDeflection; // linear deflection (default value is 0.1)
-                    importerSettings.CurveInterpolationSettings.MinimumOfPoints = 2;              // minimum number of points  (default value is 2)
-                    importerSettings.CurveInterpolationSettings.Tolerance = 0.1;                  // tolerance in curve parametric scope (original parameter name: theUTo; default value is 1.0e-9)
-                    importerSettings.CurveInterpolationSettings.MinimalLength = 0.1;              // minimal length (default value is 1.0e-7)
+                    _importerSettings.CurveInterpolationSettings.AngularDeflection = edgeDeflection;   // angular deflection in radians (default value is 0.1)
+                    _importerSettings.CurveInterpolationSettings.CurvatureDeflection = edgeDeflection; // linear deflection (default value is 0.1)
+                    _importerSettings.CurveInterpolationSettings.MinimumOfPoints = 2;              // minimum number of points  (default value is 2)
+                    _importerSettings.CurveInterpolationSettings.Tolerance = 0.1;                  // tolerance in curve parametric scope (original parameter name: theUTo; default value is 1.0e-9)
+                    _importerSettings.CurveInterpolationSettings.MinimalLength = 0.1;              // minimal length (default value is 1.0e-7)
                     
                     if (IsLoggingCheckBox.IsChecked ?? false)
                     {
@@ -280,14 +281,14 @@ namespace CadImporter
                         else
                             _logStringBuilder.Clear();
 
-                        importerSettings.LogAction = AddCadImporterLogAction;
+                        _importerSettings.LogAction = AddCadImporterLogAction;
                     }
                     else
                     {
-                        importerSettings.LogAction = null;
+                        _importerSettings.LogAction = null;
                     }
 
-                    _cadImporter.Initialize(importerSettings);
+                    _cadImporter.Initialize(_importerSettings);
 
                     // Load file
 
@@ -526,23 +527,23 @@ namespace CadImporter
             switch (cadCurve)
             {
                 case CadLine cadLine:
-                    infoText = $"Location: ({cadLine.Location.X} {cadLine.Location.Y} {cadLine.Location.Z})\r\nDirection: ({cadLine.Direction.X} {cadLine.Direction.Y} {cadLine.Direction.Z})";
+                    infoText = $"Location: {cadLine.Location.ToFormatedString()}\r\nDirection: {cadLine.Direction.ToFormatedString()}";
                     break;
                 
                 case CadCircle cadCircle:
-                    infoText = $"Location: ({cadCircle.Location.X} {cadCircle.Location.Y} {cadCircle.Location.Z})\r\nRadius: {cadCircle.Radius}\r\nXAxis: ({cadCircle.XAxis.X} {cadCircle.XAxis.Y} {cadCircle.XAxis.Z})\r\nYAxis: ({cadCircle.YAxis.X} {cadCircle.YAxis.Y} {cadCircle.YAxis.Z})";
+                    infoText = $"Location: {cadCircle.Location.ToFormatedString()}\r\nRadius: {cadCircle.Radius}\r\nXAxis: {cadCircle.XAxis.ToFormatedString()}\r\nYAxis: {cadCircle.YAxis.ToFormatedString()}";
                     break;
 
                 case CadEllipse cadEllipse:
-                    infoText = $"Location: ({cadEllipse.Location.X} {cadEllipse.Location.Y} {cadEllipse.Location.Z})\r\nMajorRadius: {cadEllipse.MajorRadius}\r\nMinorRadius: {cadEllipse.MinorRadius}\r\nXAxis: ({cadEllipse.XAxis.X} {cadEllipse.XAxis.Y} {cadEllipse.XAxis.Z})\r\nYAxis: ({cadEllipse.YAxis.X} {cadEllipse.YAxis.Y} {cadEllipse.YAxis.Z})";
+                    infoText = $"Location: {cadEllipse.Location.ToFormatedString()}\r\nMajorRadius: {cadEllipse.MajorRadius.ToFormatedString()}\r\nMinorRadius: {cadEllipse.MinorRadius.ToFormatedString()}\r\nXAxis: {cadEllipse.XAxis.ToFormatedString()}\r\nYAxis: {cadEllipse.YAxis.ToFormatedString()}";
                     break;
                 
                 case CadHyperbola cadHyperbola:
-                    infoText = $"Location: ({cadHyperbola.Location.X} {cadHyperbola.Location.Y} {cadHyperbola.Location.Z})\r\nMajorRadius: {cadHyperbola.MajorRadius}\r\nMinorRadius: {cadHyperbola.MinorRadius}\r\nXAxis: ({cadHyperbola.XAxis.X} {cadHyperbola.XAxis.Y} {cadHyperbola.XAxis.Z})\r\nYAxis: ({cadHyperbola.YAxis.X} {cadHyperbola.YAxis.Y} {cadHyperbola.YAxis.Z})";
+                    infoText = $"Location: {cadHyperbola.Location.ToFormatedString()}\r\nMajorRadius: {cadHyperbola.MajorRadius.ToFormatedString()}\r\nMinorRadius: {cadHyperbola.MinorRadius.ToFormatedString()}\r\nXAxis: ({cadHyperbola.XAxis.ToFormatedString()}\r\nYAxis: {cadHyperbola.YAxis.ToFormatedString()}";
                     break;
 
                 case CadParabola cadParabola:
-                    infoText = $"Location: ({cadParabola.Location.X} {cadParabola.Location.Y} {cadParabola.Location.Z})\r\nFocalLength: {cadParabola.FocalLength}\r\nXAxis: ({cadParabola.XAxis.X} {cadParabola.XAxis.Y} {cadParabola.XAxis.Z})\r\nYAxis: ({cadParabola.YAxis.X} {cadParabola.YAxis.Y} {cadParabola.YAxis.Z})";
+                    infoText = $"Location: {cadParabola.Location.ToFormatedString()}\r\nFocalLength: {cadParabola.FocalLength.ToFormatedString()}\r\nXAxis: {cadParabola.XAxis.ToFormatedString()}\r\nYAxis: {cadParabola.YAxis.ToFormatedString()}";
                     break;
 
                 case CadBezierCurve cadBezierCurve:
@@ -550,17 +551,17 @@ namespace CadImporter
                     break;
 
                 case CadBSplineCurve cadBSplineCurve:
-                    infoText = $"Poles count: {cadBSplineCurve.Poles.Length}\r\nWeights count: {cadBSplineCurve.Weights?.Length ?? 0}\r\nKnots count: {cadBSplineCurve.Knots?.Length ?? 0}\r\nDegree: {cadBSplineCurve.Degree}\r\nIsPeriodic: {cadBSplineCurve.IsPeriodic}";
+                    infoText = $"Poles count: {cadBSplineCurve.Poles.Length}\r\nWeights count: {cadBSplineCurve.Weights?.Length ?? 0}\r\nKnots count: {cadBSplineCurve.Knots?.Length ?? 0}\r\nDegree: {cadBSplineCurve.Degree.ToFormatedString()}\r\nIsPeriodic: {cadBSplineCurve.IsPeriodic}";
                     break;
 
                 case CadOffsetCurve cadOffsetCurve:
-                    infoText = $"BasisCurve: {cadOffsetCurve.BasisCurve.GetType().Name}\r\nOffsetDirection: ({cadOffsetCurve.OffsetDirection.X} {cadOffsetCurve.OffsetDirection.Y} {cadOffsetCurve.OffsetDirection.Z})\r\nOffsetLength: {cadOffsetCurve.OffsetLength}";
+                    infoText = $"BasisCurve: {cadOffsetCurve.BasisCurve.GetType().Name}\r\nOffsetDirection: ({cadOffsetCurve.OffsetDirection.X.ToFormatedString()} {cadOffsetCurve.OffsetDirection.Y.ToFormatedString()} {cadOffsetCurve.OffsetDirection.Z.ToFormatedString()})\r\nOffsetLength: {cadOffsetCurve.OffsetLength.ToFormatedString()}";
                     break;
             }
 
             if (infoText != null)
             {
-                infoText += $"\r\nInterval: [{cadCurve.IntervalStart} {cadCurve.IntervalEnd}]";
+                infoText += $"\r\nInterval: [{cadCurve.IntervalStart.ToFormatedString()} {cadCurve.IntervalEnd.ToFormatedString()}]";
             }
 
             ShowObjectInfo(infoText);
@@ -577,11 +578,11 @@ namespace CadImporter
             
             string objectInfoText;
             if (cadFace.EdgeLengths != null)
-                objectInfoText = $"EdgeLength: {cadFace.EdgeLengths[edgeIndex / 2]}\r\n";
+                objectInfoText = $"EdgeLength: {(cadFace.EdgeLengths[edgeIndex / 2]).ToFormatedString()} {_importerSettings.ImportedUnits.ToFormatedString()}\r\n";
             else
                 objectInfoText = "";
 
-            objectInfoText += $"Positions count: {selectedEdgePositions.Length}";
+            objectInfoText += $"Positions count: {selectedEdgePositions.Length.ToFormatedString()}";
 
             ShowObjectInfo(objectInfoText);
         }
@@ -601,15 +602,15 @@ namespace CadImporter
 
             string faceInfoText;
             if (cadFace.SurfaceArea > 0)
-                faceInfoText = $"SurfaceArea: {cadPart.SurfaceArea}\r\n";
+                faceInfoText = $"SurfaceArea: {cadPart.SurfaceArea.ToFormatedString()} {_importerSettings.ImportedUnits.ToFormatedString()}2\r\n";
             else
                 faceInfoText = "";
 
             if (cadFace.VertexBuffer != null)
-                faceInfoText += $"Positions count: {cadFace.VertexBuffer.Length / 8}\r\n"; // 8 floats for one position (xPos, yPos, zPos, xNormal, yNormal, zNormal, u, v)
+                faceInfoText += $"Positions count: {(cadFace.VertexBuffer.Length / 8).ToFormatedString()}\r\n"; // 8 floats for one position (xPos, yPos, zPos, xNormal, yNormal, zNormal, u, v)
 
             if (cadFace.TriangleIndices != null)
-                faceInfoText += $"Triangles count: {cadFace.TriangleIndices.Length / 3}"; // 3 indices for one triangle
+                faceInfoText += $"Triangles count: {(cadFace.TriangleIndices.Length / 3).ToFormatedString()}"; // 3 indices for one triangle
 
             ShowObjectInfo(faceInfoText);
         }
@@ -648,7 +649,7 @@ namespace CadImporter
             else
                 shellInfoText = "";
 
-            shellInfoText += $"Positions count: {totalPositions}\r\nTriangles count: {totalTriangles}";
+            shellInfoText += $"Positions count: {totalPositions.ToFormatedString()}\r\nTriangles count: {totalTriangles.ToFormatedString()}";
                 
             ShowObjectInfo(shellInfoText);
         }
@@ -680,13 +681,14 @@ namespace CadImporter
                 if (!string.IsNullOrEmpty(objectInfoText))
                     objectInfoText += "\r\n";
 
-                objectInfoText += $"Volume: {cadPart.Volume}\r\nSurfaceArea: {cadPart.SurfaceArea}";
+                var unitsName = _importerSettings.ImportedUnits.ToFormatedString();
+                objectInfoText += $"Volume: {cadPart.Volume.ToFormatedString()} {unitsName}3\r\nSurfaceArea: {cadPart.SurfaceArea.ToFormatedString()} {unitsName}2";
             }
 
             if (!string.IsNullOrEmpty(objectInfoText))
                 objectInfoText += "\r\n";
 
-            objectInfoText += $"X Bounds: min: {cadPart.BoundingBoxMin.X} max: {cadPart.BoundingBoxMax.X}\r\nY Bounds: min: {cadPart.BoundingBoxMin.Y} max: {cadPart.BoundingBoxMax.Y}\r\nZ Bounds: min: {cadPart.BoundingBoxMin.Z} max: {cadPart.BoundingBoxMax.Z}";
+            objectInfoText += $"X Bounds: min: {cadPart.BoundingBoxMin.X.ToFormatedString()} max: {cadPart.BoundingBoxMax.X.ToFormatedString()}\r\nY Bounds: min: {cadPart.BoundingBoxMin.Y.ToFormatedString()} max: {cadPart.BoundingBoxMax.Y.ToFormatedString()}\r\nZ Bounds: min: {cadPart.BoundingBoxMin.Z.ToFormatedString()} max: {cadPart.BoundingBoxMax.Z.ToFormatedString()}";
 
 
             if (cadPart.TransformMatrix != null)

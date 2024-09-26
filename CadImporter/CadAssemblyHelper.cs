@@ -1,4 +1,5 @@
-﻿using Ab4d.OpenCascade;
+﻿using System.Text.Json.Serialization;
+using Ab4d.OpenCascade;
 
 #if DXENGINE
 using SharpDX;
@@ -314,5 +315,67 @@ public static class CadAssemblyHelper
 #else
         result = Vector3.Transform(vector, transform);
 #endif
+    }
+
+    public static string ToFormatedString(this CadVector3 value)
+    {
+        return $"({value.X.ToFormatedString()} {value.X.ToFormatedString()} {value.X.ToFormatedString()})";
+    }
+    
+    // Dynamically adjust number of shown decimals
+    public static string ToFormatedString(this float value)
+    {
+        if (MathF.Abs(value) >= 1000)
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:#,##0}", value);
+            
+        if (MathF.Abs(value) >= 100)
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F1}", value);
+
+        if (MathF.Abs(value) >= 10)
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F2}", value);
+
+        return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F4}", value);
+    }
+
+    // Dynamically adjust number of shown decimals
+    public static string ToFormatedString(this double value)
+    {
+        if (Math.Abs(value) >= 1000)
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:#,##0}", value);
+            
+        if (Math.Abs(value) >= 100)
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F1}", value);
+
+        if (Math.Abs(value) >= 10)
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F2}", value);
+
+        return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F4}", value);
+    }
+
+    public static string ToFormatedString(this int value)
+    {
+        return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:#,##0}", value);
+    }
+
+    // Undefined = 0,
+    // Inch = 1,
+    // Millimeter = 2,
+    // Foot = 4,
+    // Mile = 5,
+    // Meter = 6,
+    // Kilometer = 7,
+    // Mil = 8,
+    // Micron = 9,
+    // Centimeter = 10, // 0x0000000A
+    // Microinch = 11, // 0x0000000B
+    private readonly static string[] _cadUnitNames = { "", "inch", "mm", "foot", "mile", "m", "km", "mil", "μm", "cm", "μinch"};
+
+    public static string ToFormatedString(this CadUnitTypes value)
+    {
+        int index = (int)value;
+        if (index > 0 && index < _cadUnitNames.Length)
+            return _cadUnitNames[index];
+
+        return "";
     }
 }
