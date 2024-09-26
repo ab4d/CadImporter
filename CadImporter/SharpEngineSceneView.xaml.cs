@@ -22,10 +22,9 @@ namespace CadImporter
     /// </summary>
     public partial class SharpEngineSceneView : UserControl
     {
-        //private DisposeList? _disposables;
-
-        private LineMaterial _edgeLineMaterial;
-        private LineMaterial _selectedLineMaterial;
+        private LineMaterial? _edgeLineMaterial;
+        private LineMaterial? _selectedLineMaterial;
+        private LineMaterial? _selectedHiddenLineMaterial;
 
         private Vector3[]? _selectedEdgeLinePositions;
 
@@ -36,8 +35,6 @@ namespace CadImporter
         private TargetPositionCamera _targetPositionCamera;
 
         private PointerCameraController _pointerCameraController;
-
-        private CameraAxisPanel _cameraAxisPanel;
 
         private GroupNode _rootGroupNode;
         private GroupNode _selectedLinesGroupNode;
@@ -89,15 +86,20 @@ namespace CadImporter
             _pointerCameraController.CameraMoveStarted += (sender, args) => IsCameraMoving = true;
             _pointerCameraController.CameraMoveEnded += (sender, args) => IsCameraMoving = false;
 
-            _cameraAxisPanel = new CameraAxisPanel(MainSceneView.SceneView, _targetPositionCamera, width: 100, height: 100, adjustSizeByDpiScale: true)
+            var cameraAxisPanel = new CameraAxisPanel(MainSceneView.SceneView, _targetPositionCamera, width: 100, height: 100, adjustSizeByDpiScale: true)
             {
                 Position = new Vector2(10, 10),
                 Alignment = PositionTypes.BottomLeft
             };
-
-            // Wait until DXEngine is initialized and then load the step file
+            
+            // Wait until SharpEngineSceneView is initialized and then load the step file
             MainSceneView.SceneViewInitialized += (sender, args) =>
             {
+                // Before SharpEngine v2.1 we also need to manually set OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering to true.
+                // This will clear the depth-buffer before rendering objects in OverlayRenderingLayer.
+                if (MainSceneView.Scene.OverlayRenderingLayer != null)
+                    MainSceneView.Scene.OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering = true;
+
                 OnSceneViewInitialized();
             };
 
@@ -127,45 +129,27 @@ namespace CadImporter
 
         public void ClearScene()
         {
+            _edgeLineMaterial = null;
+            _selectedLineMaterial = null;
+
             _rootGroupNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
         }
 
         public void ProcessCadParts(CadAssembly cadAssembly)
         {
-            // All materials are disposed in ClearScene so here we create new materials
+            ProcessCadParts(cadAssembly, cadAssembly.RootParts, _rootGroupNode);
+        }
 
-            _edgeLineMaterial = new LineMaterial()
+        private void ProcessCadParts(CadAssembly cadAssembly, List<CadPart> cadParts, GroupNode parentGroupNode)
+        {
+            // All materials are disposed in ClearScene so here we create new materials
+            _edgeLineMaterial ??= new LineMaterial()
             {
                 LineThickness = 1f,
                 LineColor = Color4.Black,
                 DepthBias = 0.001f,
             };
 
-            _selectedLineMaterial = new LineMaterial()
-            {
-                LineThickness = 1.5f,
-                LineColor = Colors.Red,
-                // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
-                // IMPORTANT: The values for selected lines have bigger depth bias than normal edge lines. This renders them on top of normal edge lines.
-                DepthBias = 0.002f,
-            };
-
-            // Hidden lines are not yet supported in Ab4d.SharpEngine.
-            //// Use HiddenLineMaterial instead of LineMaterial to define a line material that renders lines that are behind 3D objects
-            //_selectedHiddenLineMaterial = new HiddenLineMaterial()
-            //{
-            //    LineThickness = 0.5f,
-            //    LineColor = Colors.Red.ToColor4(),
-            //    DepthBias = 0.15f,
-            //    DynamicDepthBiasFactor = 0.03f
-            //};
-
-
-            ProcessCadParts(cadAssembly, cadAssembly.RootParts, _rootGroupNode);
-        }
-
-        private void ProcessCadParts(CadAssembly cadAssembly, List<CadPart> cadParts, GroupNode parentGroupNode)
-        {
             for (var i = 0; i < cadParts.Count; i++)
             {
                 var onePart = cadParts[i];
@@ -251,10 +235,6 @@ namespace CadImporter
                             var edgePositions = new Vector3[edgePositionsCount];
 
                             CadAssemblyHelper.AddEdgePositions(faceData, edgePositions);
-                            // To transform edge positions call
-                            // var matrix = transformation.Value;
-                            // AddEdgePositions(faceData, edgePositions, ref matrix);
-
 
                             var edgeLinesNode = new MultiLineNode(edgePositions, isLineStrip: false, _edgeLineMaterial, name: $"{onePart.Name}_Face{j}_EdgeLines");
 
@@ -325,8 +305,46 @@ namespace CadImporter
 
         public void ShowSelectedLinePositions(Vector3[] selectedEdgePositions)
         {
+            _selectedLineMaterial ??= new LineMaterial()
+            {
+                LineThickness = 1.5f,
+                LineColor = Colors.Red,
+                // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
+                // IMPORTANT: The values for selected lines have bigger depth bias than normal edge lines. This renders them on top of normal edge lines.
+                DepthBias = 0.002f,
+            };
+            
+            _selectedHiddenLineMaterial ??= new LineMaterial()
+            {
+                LineThickness = 0.5f,
+                LineColor = Colors.Red,
+                // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
+                // IMPORTANT: The values for selected lines have bigger depth bias than normal edge lines. This renders them on top of normal edge lines.
+                DepthBias = 0.002f,
+            };
+
+
+            // Ab4d.SharpEngine before v2.1 does not support rendering only hidden lines,
+            // so we need to first render always visible lines (line thickness is 0.5).
+            // This is done by setting CustomRenderingLayer to Scene.OverlayRenderingLayer.
+            // See Advanced/BackgroundAndOverlayRenderingSample sample in the Ab4d.SharpEngine samples project for more info.
+
+            var selectedHiddenLineNode = new MultiLineNode(selectedEdgePositions, isLineStrip: false, material: _selectedHiddenLineMaterial, name: "SelectedHiddenEdgesLineNode");
+            
+            // To render lines that are always visible, we need to put them to the OverlayRenderingLayer.
+            // Before objects from this layer are rendered, the depth buffer is cleared so no previously rendered object will obscure the lines.
+            //
+            // To do this on ModelNodes or LineNodes, you can use the CustomRenderingLayer property.
+            // On GroupNode, you need to call ModelUtils.SetCustomRenderingLayer method to change CustomRenderingLayer property on all child nodes.
+            selectedHiddenLineNode.CustomRenderingLayer = MainSceneView.Scene.OverlayRenderingLayer;
+
+            _selectedLinesGroupNode.Add(selectedHiddenLineNode);
+
+            
+            // Then render only visible lines on top (line thickness is 1.5).
             var selectedLineNode = new MultiLineNode(selectedEdgePositions, isLineStrip: false, material: _selectedLineMaterial, name: "SelectedEdgesLineNode");
             _selectedLinesGroupNode.Add(selectedLineNode);
+
 
             _selectedEdgeLinePositions = selectedEdgePositions;
         }
@@ -337,38 +355,6 @@ namespace CadImporter
                 return;
 
             MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
-
-
-            //if (_isZUpAxis)
-            //    return;
-
-            //// When changing coordinate system, we also need to update the Camera's TargetPosition
-            //var targetPosition = Camera1.TargetPosition;
-
-            //// Set the axes so they show left handed coordinate system such Autocad (with z up)
-            //// Note: WPF and DXEngine use right handed coordinate system (such as OpenGL)
-
-            //// The transformation defines the new axis - defined in matrix columns in upper left 3x3 part of the matrix:
-            ////      x axis - 1st column: 1  0  0  (in the positive x direction - same as WPF 3D) 
-            ////      y axis - 2nd column: 0  0 -1  (in the negative z direction - into the screen)
-            ////      z axis - 3rd column: 0  1  0  (in the positive y direction - up)
-            //var zUpAxisTransformation = new MatrixTransform3D(new Matrix3D(1, 0, 0,  0,
-            //                                                               0, 0, -1, 0,
-            //                                                               0, 1, 0,  0,
-            //                                                               0, 0, 0,  1));
-
-            //RootModelVisual.Transform = zUpAxisTransformation;
-            //SelectedLinesModelVisual.Transform = zUpAxisTransformation;
-
-            //CameraNavigationCircles1.UseZUpAxis();
-
-            //CameraAxisPanel1.CustomizeAxes(new Vector3D(1, 0, 0), "X", Colors.Red,
-            //                               new Vector3D(0, 1, 0), "Z", Colors.Blue,
-            //                               new Vector3D(0, 0, -1), "Y", Colors.Green);
-
-            //Camera1.TargetPosition = new Point3D(targetPosition.X, targetPosition.Z, -targetPosition.Y); 
-
-            //_isZUpAxis = true;
         }
 
         public void UseYUpAxis()
@@ -377,27 +363,6 @@ namespace CadImporter
                 return;
 
             MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.YUpRightHanded);
-
-            //if (!_isZUpAxis)
-            //    return;
-
-            //// When changing coordinate system, we also need to update the Camera's TargetPosition
-            //var targetPosition = Camera1.TargetPosition;
-
-            //// WPF and DXEngine use right handed coordinate system (such as OpenGL)
-
-            //RootModelVisual.Transform = null;
-            //SelectedLinesModelVisual.Transform = null;
-
-            //CameraNavigationCircles1.UseYUpAxis();
-
-            //CameraAxisPanel1.CustomizeAxes(new Vector3D(1, 0, 0), "X", Colors.Red,
-            //                               new Vector3D(0, 1, 0), "Y", Colors.Blue,
-            //                               new Vector3D(0, 0, 1), "Z", Colors.Green);
-
-            //Camera1.TargetPosition = new Point3D(targetPosition.X, -targetPosition.Z, targetPosition.Y); 
-
-            //_isZUpAxis = false;
         }
 
         public void UsePerspectiveCamera(bool isPerspectiveCamera)
