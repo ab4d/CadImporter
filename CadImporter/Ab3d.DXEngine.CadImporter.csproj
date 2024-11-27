@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
     <DefineConstants>DXENGINE</DefineConstants>
-    <AssemblyName>Ab3d.DXEngine.CadImporter</AssemblyName>
+    <AssemblyName>Ab3d.DXEngine.CadImporter.Sample</AssemblyName>
     <RootNamespace>CadImporter</RootNamespace>
     <DefaultItemExcludes>$(DefaultItemExcludes);SharpEngineSceneView.xaml;SharpEngineSceneView.xaml.cs</DefaultItemExcludes> <!-- This is required to exclude DXEngineSceneView -->
   </PropertyGroup>
@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.OpenCascade" Version="0.2.0-beta2" />
+    <PackageReference Include="Ab4d.OpenCascade" Version="1.0.0" />
   </ItemGroup>
   
   <ItemGroup Condition="$(DefineConstants.Contains('DXENGINE'))">

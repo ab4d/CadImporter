@@ -52,10 +52,12 @@ For the required version, download the occt-vc143-64.zip and 3rdparty-vc14-64.zi
 Then you have multiple options:
 
 1. Copy the required dlls to the output folder of your application. This is a recommended option because you can use any type from the Ab4d.OpenCascade anywhere in the application. This is also recommended when distributing your application.
-2. Copy the required dlls to a custom folder and then adjust PATH environment variable or call system's SetDllDirectory function with the path to the OpenCascade folder. This option is used in this sample application (this the structure of files in the output folder nicer).
+2. Copy the required dlls to a custom folder and then adjust PATH environment variable or call system's SetDllDirectory function with the path to the OpenCascade folder. Updating the PATH is also used in the sample application. There the PATH is updated at runtime after the application starts (this way is the structure of files in the output folder nicer).
 
 For both methods you can use the "copy-open-cascade-dlls.bat" batch file.
 Before running it, open the file and update the OCCT and OCCT_THIRD_PARTY paths so that they point to the paths where you have extracted the zip files.
+
+To correctly load the Ab4d.OpenCascade that is a C++/CLI assembly, the Ijwhost.dll file needs to be available in the application's output path. This file is part of the Ab4d.OpenCascade NuGet package and should be automatically installed when the package is used. This file is used for finding and loading the runtime to the C++/CLI assembly.
 
 See also the InitializeCadImporter and CreateCadImporter methods in the MainWindow.xaml.cs.
 
@@ -71,6 +73,3 @@ For example, in this sample the initialization of ImporterUnitsComboBox was remo
     // The following line will try to use CadUnitTypes enum from Ab4d.OpenCascade library. This will load OpenCascade dlls.
     ImporterUnitsComboBox.ItemsSource = Enum.GetNames<Ab4d.OpenCascade.CadUnitTypes>();
 
-## Roadmap
-
-- Add progress indication while reading the file.

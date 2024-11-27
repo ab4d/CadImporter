@@ -21,12 +21,13 @@ namespace CadImporter
     public partial class MainWindow : Window
     {
         // When the data types returned by the Ab4d.OpenCascade.CadImporter are changed, then the Ab4d.OpenCascade.CadImporter.CadImporterVersion major or minor version is changed (changed build version does not change the data model).
-        private static readonly Version SupportedCadImporterVersion = new Version(0, 1);
+        private static readonly Version SupportedCadImporterVersion = new Version(1, 0);
 
         private string? _fileName;
 
         private Ab4d.OpenCascade.CadImporter? _cadImporter;
         private CadAssembly? _cadAssembly;
+        private string _importedUnits = "";
 
         private StringBuilder? _logStringBuilder;
 
@@ -45,7 +46,6 @@ namespace CadImporter
         private DXEngineSceneView _sceneView; 
 #else
         private SharpEngineSceneView _sceneView;
-        private ImporterSettings _importerSettings;
 #endif
 
         public MainWindow()
@@ -89,6 +89,13 @@ namespace CadImporter
 #if DXENGINE
             _sceneView = new DXEngineSceneView();
 #else
+            // Ab4d.SharpEngine Samples License can be used only for Ab4d.SharpEngine samples.
+            // To use Ab4d.SharpEngine in your project, get a license from ab4d.com/trial or ab4d.com/purchase 
+            Ab4d.SharpEngine.Licensing.SetLicense(licenseOwner: "AB4D",
+                                                  licenseType: "SamplesLicense",
+                                                  platforms: "All",
+                                                  license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
+
             _sceneView = new SharpEngineSceneView();
 
             // CameraNavigationCircles and MouseCameraControllerInfo controls are not available in Ab4d.SharpEngine
@@ -177,11 +184,11 @@ namespace CadImporter
                 // In case of EEFileLoadException exception (thrown when native debugging is enabled), the folder with 3rd party dlls is probably not found
                 // See installation instructions in readme.txt on how to define the folder structure
 
-                string errorMessage = "Cannot load native OpenCASCADE library:\r\n" + 
+                string errorMessage = "Cannot load native OpenCASCADE library.\r\n\r\nError message:\r\n" + 
                                       ex.Message + 
-                                      "\r\n\r\nTo solve that do one of the following:\r\nCopy all required OpenCascade dlls to the output path (same as .exe).\r\nCall system's SetDllDirectory function and set the path to OpenCascade folder.\r\nSet PATH environment to OpenCascade bin folder and its third-party folder.\r\n\r\nSee readme.txt for more info.";
+                                      "\r\n\r\nTo solve that do one of the following:\r\n- Check that the Ijwhost.dll file is located in output path (the file is part of the Ab4d.OpenCascade NuGet package).\r\n- Copy all required OpenCascade dlls to the output path (same as .exe).\r\n- Call system's SetDllDirectory function and set the path to OpenCascade folder.\r\n- Set PATH environment to OpenCascade bin folder and its third-party folder.\r\n\r\nSee README.md in the sln folder for more info.";
 
-                MessageBox.Show(errorMessage);
+                MessageBox.Show(errorMessage, "OpenCASCADE load error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
             catch (Exception ex)
             {
@@ -208,6 +215,14 @@ namespace CadImporter
             // You can get the required OpenCascade version by:
             //var requiredOpenCascadeVersion = Ab4d.OpenCascade.CadImporter.OpenCascadeVersion;
 
+
+            //
+            // Activate Ab4d.OpenCascade.CadImporter
+            //
+            // Ab4d.OpenCascade.CadImporter can be used only when used with the Ab3d.DXEngine or Ab4d.SharpEngine libraries (cannot be used with a free license).
+            // When Ab4d.OpenCascade is used with Ab3d.DXEngine, it needs to be activated by DXScene (DXScene must be already initialized).
+            // When Ab4d.OpenCascade is used with Ab4d.SharpEngine, it needs to be activated by SceneView or Scene (GpuDevice must be already initialized).
+            // If you want to use Ab4d.OpenCascade without Ab3d.DXEngine or Ab4d.SharpEngine libraries, contact support (https://www.ab4d.com/Feedback.aspx)
             _sceneView.ActivateCadImporter();
 
             // Create an instance of CadImporter
@@ -241,11 +256,13 @@ namespace CadImporter
                 {
                     // Set ImporterSettings:
 
-                    _importerSettings = new ImporterSettings();
-                    _importerSettings.DefaultColor = new float[] { 0.5f, 0.5f, 0.5f, 1 };
+                    // Get default importer settings:
+                    var importerSettings = _cadImporter.Settings;
+
+                    importerSettings.DefaultColor = new float[] { 0.5f, 0.5f, 0.5f, 1 };
 
                     // When true, then exact Volume (for CadParts), SurfaceArea (for CadParts and CadFace) and EdgeLengths (for CadFace) are calculated. It may take some time to calculate those values.
-                    _importerSettings.CalculateShapeProperties = CalculateShapePropertiesCheckBox.IsChecked ?? false;
+                    importerSettings.CalculateShapeProperties = CalculateShapePropertiesCheckBox.IsChecked ?? false;
 
                     // By default, the CadImporter generates the triangulated mesh and interpolated edge positions.
                     // If you only need to get the original CAD objects and structure, you can set the following two properties to false:
@@ -254,13 +271,13 @@ namespace CadImporter
 
                     // Sets the units in which the imported CAD objects will be
                     if (ImporterUnitsComboBox.SelectedIndex != -1)
-                        _importerSettings.ImportedUnits = Enum.GetValues<Ab4d.OpenCascade.CadUnitTypes>()[ImporterUnitsComboBox.SelectedIndex + 1]; // +1 because Undefined is skipped in xaml
+                        importerSettings.ImportedUnits = Enum.GetValues<Ab4d.OpenCascade.CadUnitTypes>()[ImporterUnitsComboBox.SelectedIndex + 1]; // +1 because Undefined is skipped in xaml
                     
                     // There are many parameters for MeshingSettings.
                     // See OpenCascade's IMeshTools_Parameters: https://dev.opencascade.org/doc/refman/html/struct_i_mesh_tools___parameters.html
                     var meshDeflection = GetSelectedComboBoxDoubleValue(MeshTriangulationDeflationComboBox);
-                    _importerSettings.MeshingSettings.Angle = meshDeflection;
-                    _importerSettings.MeshingSettings.Deflection = meshDeflection;
+                    importerSettings.MeshingSettings.Angle = meshDeflection;
+                    importerSettings.MeshingSettings.Deflection = meshDeflection;
 
                     // The following settings define how the edge lines are interpolated
                     // Changing CurvatureDeflection has the biggest effect, for example:
@@ -268,11 +285,11 @@ namespace CadImporter
                     // For Circle with CurvatureDeflection with 0.5 36 positions are generated
 
                     var edgeDeflection = GetSelectedComboBoxDoubleValue(EdgeInterpolationDeflationComboBox);
-                    _importerSettings.CurveInterpolationSettings.AngularDeflection = edgeDeflection;   // angular deflection in radians (default value is 0.1)
-                    _importerSettings.CurveInterpolationSettings.CurvatureDeflection = edgeDeflection; // linear deflection (default value is 0.1)
-                    _importerSettings.CurveInterpolationSettings.MinimumOfPoints = 2;              // minimum number of points  (default value is 2)
-                    _importerSettings.CurveInterpolationSettings.Tolerance = 0.1;                  // tolerance in curve parametric scope (original parameter name: theUTo; default value is 1.0e-9)
-                    _importerSettings.CurveInterpolationSettings.MinimalLength = 0.1;              // minimal length (default value is 1.0e-7)
+                    importerSettings.CurveInterpolationSettings.AngularDeflection = edgeDeflection;   // angular deflection in radians (default value is 0.1)
+                    importerSettings.CurveInterpolationSettings.CurvatureDeflection = edgeDeflection; // linear deflection (default value is 0.1)
+                    importerSettings.CurveInterpolationSettings.MinimumOfPoints = 2;              // minimum number of points  (default value is 2)
+                    importerSettings.CurveInterpolationSettings.Tolerance = 0.1;                  // tolerance in curve parametric scope (original parameter name: theUTo; default value is 1.0e-9)
+                    importerSettings.CurveInterpolationSettings.MinimalLength = 0.1;              // minimal length (default value is 1.0e-7)
                     
                     if (IsLoggingCheckBox.IsChecked ?? false)
                     {
@@ -281,14 +298,13 @@ namespace CadImporter
                         else
                             _logStringBuilder.Clear();
 
-                        _importerSettings.LogAction = AddCadImporterLogAction;
+                        importerSettings.LogAction = AddCadImporterLogAction;
                     }
                     else
                     {
-                        _importerSettings.LogAction = null;
+                        importerSettings.LogAction = null;
                     }
 
-                    _cadImporter.Initialize(_importerSettings);
 
                     // Load file
 
@@ -297,6 +313,8 @@ namespace CadImporter
                         _cadAssembly = _cadImporter.ImportIgesFile(fileName);
                     else
                         _cadAssembly = _cadImporter.ImportStepFile(fileName);
+
+                    _importedUnits = _cadImporter.Settings.ImportedUnits.ToFormatedString();
                 }
                 catch (Exception ex)
                 {
@@ -578,7 +596,7 @@ namespace CadImporter
             
             string objectInfoText;
             if (cadFace.EdgeLengths != null)
-                objectInfoText = $"EdgeLength: {(cadFace.EdgeLengths[edgeIndex / 2]).ToFormatedString()} {_importerSettings.ImportedUnits.ToFormatedString()}\r\n";
+                objectInfoText = $"EdgeLength: {(cadFace.EdgeLengths[edgeIndex / 2]).ToFormatedString()} {_importedUnits}\r\n";
             else
                 objectInfoText = "";
 
@@ -602,7 +620,7 @@ namespace CadImporter
 
             string faceInfoText;
             if (cadFace.SurfaceArea > 0)
-                faceInfoText = $"SurfaceArea: {cadPart.SurfaceArea.ToFormatedString()} {_importerSettings.ImportedUnits.ToFormatedString()}2\r\n";
+                faceInfoText = $"SurfaceArea: {cadPart.SurfaceArea.ToFormatedString()} {_importedUnits}2\r\n";
             else
                 faceInfoText = "";
 
@@ -679,10 +697,9 @@ namespace CadImporter
             if (cadPart.Volume > 0 || cadPart.SurfaceArea > 0)
             {
                 if (!string.IsNullOrEmpty(objectInfoText))
-                    objectInfoText += "\r\n";
-
-                var unitsName = _importerSettings.ImportedUnits.ToFormatedString();
-                objectInfoText += $"Volume: {cadPart.Volume.ToFormatedString()} {unitsName}3\r\nSurfaceArea: {cadPart.SurfaceArea.ToFormatedString()} {unitsName}2";
+                    objectInfoText += "\r\n"; 
+                
+                objectInfoText += $"Volume: {cadPart.Volume.ToFormatedString()} {_importedUnits}3\r\nSurfaceArea: {cadPart.SurfaceArea.ToFormatedString()} {_importedUnits}2";
             }
 
             if (!string.IsNullOrEmpty(objectInfoText))
