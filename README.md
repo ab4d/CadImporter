@@ -1,14 +1,14 @@
 # CadImporter
 
-![Ab3d.DXEngine.CadImporter image](https://www.ab4d.com/Images/CadImporter/CadImporter_0_2.png)
+![Ab3d.DXEngine.CadImporter with import settings](https://www.ab4d.com/Images/CadImporter/CadImporter_1_0-1.png)
+
+![Ab3d.DXEngine.CadImporter with object hierarhy](https://www.ab4d.com/Images/CadImporter/CadImporter_0_2.png)
 
 **CadImporter** shows how to use Ab4d.OpenCascade library to **import and show 3D objects from STEP (.step and .stp) and IGES (.iges and .igs) files**.
 
 This repository contains two projects:
 - **Ab3d.DXEngine.CadImporter** - shows how to use CadImporter with [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) for DirectX rendering and [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) for 3D helper functions.
 - **Ab4d.SharpEngine.CadImporter** - shows how to use CadImporter with [Ab4d.SharpEngine](https://www.ab4d.com/SharpEngine.aspx) for Vulkan rendering (can be used only on Windows).
-
-Ab4d.OpenCascade library is currently in beta version.
 
 The CadImporter reads the hierarchy of the Parts (Compound or Solid). It can use instanced Shells that are defined by a list of Faces. 
 Each face can be defined by many Edges. For each Edge it is possible to get the original curve with its parameters. 
