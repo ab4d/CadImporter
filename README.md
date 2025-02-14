@@ -2,7 +2,7 @@
 
 ![Ab3d.DXEngine.CadImporter with import settings](https://www.ab4d.com/Images/CadImporter/CadImporter_1_0-1.png)
 
-![Ab3d.DXEngine.CadImporter with object hierarhy](https://www.ab4d.com/Images/CadImporter/CadImporter_0_2.png)
+![Ab3d.DXEngine.CadImporter with object hierarhy](https://www.ab4d.com/Images/CadImporter/CadImporter_1_0-2.png)
 
 **CadImporter** shows how to use Ab4d.OpenCascade library to **import and show 3D objects from STEP (.step and .stp) and IGES (.iges and .igs) files**.
 
