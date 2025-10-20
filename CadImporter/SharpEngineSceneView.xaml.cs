@@ -404,7 +404,7 @@ namespace CadImporter
 
             cameraAnimation.Set(CameraAnimatedProperties.TargetPosition, newTargetPosition, duration: 300);
             cameraAnimation.Set(CameraAnimatedProperties.Distance, newDistance, duration: 300);
-            cameraAnimation.Set(CameraAnimatedProperties.CameraWidth, newCameraWidth, duration: 300);
+            cameraAnimation.Set(CameraAnimatedProperties.ViewWidth, newCameraWidth, duration: 300);
 
             // Set easing function to all keyframe (we could also set that in each Set method call):
             cameraAnimation.SetEasingFunctionToAllKeyframes(EasingFunctions.CubicEaseInOutFunction);
