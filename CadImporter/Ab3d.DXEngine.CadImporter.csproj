@@ -42,8 +42,8 @@
   </ItemGroup>
   
   <ItemGroup Condition="$(DefineConstants.Contains('DXENGINE'))">
-    <PackageReference Include="Ab3d.PowerToys" Version="11.1.8864" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.0.8976" />
+    <PackageReference Include="Ab3d.PowerToys" Version="11.2.9104" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9105" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
