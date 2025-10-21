@@ -276,6 +276,7 @@ namespace CadImporter
                     // There are many parameters for MeshingSettings.
                     // See OpenCascade's IMeshTools_Parameters: https://dev.opencascade.org/doc/refman/html/struct_i_mesh_tools___parameters.html
                     var meshDeflection = GetSelectedComboBoxDoubleValue(MeshTriangulationDeflationComboBox);
+                    importerSettings.MeshingSettings.InParallel = true;
                     importerSettings.MeshingSettings.Angle = meshDeflection;
                     importerSettings.MeshingSettings.Deflection = meshDeflection;
 
