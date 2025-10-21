@@ -287,14 +287,6 @@ namespace CadImporter
             _targetPositionCamera.TargetPosition = cadAssemblyBoundingBox.GetCenterPosition();
             _targetPositionCamera.Distance = boundingBoxLength * 2;
             _targetPositionCamera.ViewWidth = boundingBoxLength * 1.5f;
-
-            // Because cadAssemblyBoundingBox is in Y-up coordinates,
-            // we need to swap Y and Z and negate Y when we are using Z-up coordinate system
-            var boundingBoxCenter = cadAssemblyBoundingBox.GetCenterPosition();
-            if (IsZUpAxis)
-                _targetPositionCamera.TargetPosition = new Vector3(boundingBoxCenter.X, boundingBoxCenter.Z, -boundingBoxCenter.Y);
-            else
-                _targetPositionCamera.TargetPosition = boundingBoxCenter;
         }
 
         public void ClearHighlightPartOrFace()
