@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Ab4d.OpenCascade" Version="1.0.0" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9386" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="4.0.9584" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="4.0.9584" />
   </ItemGroup>
 
   <ItemGroup>
